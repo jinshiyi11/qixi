@@ -9,6 +9,12 @@ Page({
     hasUserInfo: false,
     canIUse: wx.canIUse('button.open-type.getUserInfo')
   },
+  onShareAppMessage: function () {
+    return {
+      title: '一刀的小程序',
+      path: '/pages/index/index'
+    }
+  },
   //事件处理函数
   bindViewTap: function() {
     wx.navigateTo({
