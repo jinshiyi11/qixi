@@ -4,12 +4,16 @@ const app = getApp()
 
 Page({
   data: {
-    motto: 'Hello World',
-    userInfo: {},
-    hasUserInfo: false,
-    canIUse: wx.canIUse('button.open-type.getUserInfo')
+    count: 5,
+    currentIndex: 0,
+    items: [],
+    animationData: {},
+    images: [
+      'https://lg-7d7cxgzy-1251232205.cos.ap-shanghai.myqcloud.com/0.jpg',
+      'https://lg-7d7cxgzy-1251232205.cos.ap-shanghai.myqcloud.com/1.jpg'
+    ]
   },
-  onShareAppMessage: function () {
+  onShareAppMessage: function() {
     return {
       title: '一刀的小程序',
       path: '/pages/index/index'
@@ -21,40 +25,49 @@ Page({
       url: '../logs/logs'
     })
   },
-  onLoad: function () {
-    if (app.globalData.userInfo) {
-      this.setData({
-        userInfo: app.globalData.userInfo,
-        hasUserInfo: true
-      })
-    } else if (this.data.canIUse){
-      // 由于 getUserInfo 是网络请求，可能会在 Page.onLoad 之后才返回
-      // 所以此处加入 callback 以防止这种情况
-      app.userInfoReadyCallback = res => {
-        this.setData({
-          userInfo: res.userInfo,
-          hasUserInfo: true
-        })
-      }
-    } else {
-      // 在没有 open-type=getUserInfo 版本的兼容处理
-      wx.getUserInfo({
-        success: res => {
-          app.globalData.userInfo = res.userInfo
-          this.setData({
-            userInfo: res.userInfo,
-            hasUserInfo: true
-          })
-        }
-      })
-    }
+  getRandomImage: function() {
+    const index = Math.floor(Math.random() * this.data.images.length)
+    return this.data.images[index]
   },
-  getUserInfo: function(e) {
-    console.log(e)
-    app.globalData.userInfo = e.detail.userInfo
-    this.setData({
-      userInfo: e.detail.userInfo,
-      hasUserInfo: true
-    })
+  getRandomLeft: function() {
+    return Math.floor(Math.random() * 4) * 200
+  },
+  getRandomTop: function() {
+    return Math.floor(Math.random() * 5) * 200
+  },
+  onLoad: function() {
+    this.showAnimation(0)
+  },
+  onShow: function() {
+
+  },
+  showAnimation: function(index) {
+    setTimeout(function() {
+      let result = this.data.items.slice()
+      const image = this.getRandomImage()
+      const left = this.getRandomLeft()
+      const top = this.getRandomTop()
+      result.push({
+        image,
+        left,
+        top
+      });
+
+      let animation = wx.createAnimation({
+        duration: 1000,
+        timingFunction: 'ease'
+      })
+      this.animation = animation
+      animation.rotate(360).scale(1.1, 1.1).step()
+      this.setData({
+        animationData: this.animation.export(),
+        currentIndex: index,
+        items: result
+      })
+
+      if (index < this.data.count - 1) {
+        this.showAnimation(index + 1)
+      }
+    }.bind(this), 1500)
   }
 })
